@@ -1,0 +1,66 @@
+{
+  "name": "fez",
+  "version": "0.1.0",
+  "description": "A lightweight Windows voice assistant powered by Groq.",
+  "main": "dist/main/main/index.js",
+  "author": "Fez",
+  "license": "MIT",
+  "scripts": {
+    "dev": "npm run build:main && concurrently -k \"npm:dev:renderer\" \"npm:dev:main\" \"npm:dev:electron\"",
+    "dev:renderer": "vite --host 127.0.0.1",
+    "dev:main": "tsc -p tsconfig.main.json --watch",
+    "dev:electron": "wait-on tcp:5173 && nodemon --watch dist/main --ext js --exec \"cross-env VITE_DEV_SERVER_URL=http://127.0.0.1:5173 electron .\"",
+    "build": "npm run build:renderer && npm run build:main && electron-builder",
+    "build:renderer": "vite build",
+    "build:main": "tsc -p tsconfig.main.json",
+    "typecheck": "tsc --noEmit -p tsconfig.renderer.json && tsc --noEmit -p tsconfig.main.json",
+    "test:chunker": "npm run build:main && node --test tests/chunker.test.cjs tests/router.test.cjs tests/scheduling.test.cjs"
+  },
+  "build": {
+    "appId": "com.pill.voiceassistant",
+    "productName": "Fez",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "dist/**/*",
+      "package.json"
+    ],
+    "asarUnpack": [
+      "node_modules/uiohook-napi/**"
+    ],
+    "npmRebuild": false,
+    "win": {
+      "target": "nsis",
+      "signAndEditExecutable": false
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true
+    }
+  },
+  "dependencies": {
+    "chrono-node": "^2.8.0",
+    "electron-store": "^8.2.0",
+    "framer-motion": "^12.0.0",
+    "fuse.js": "^7.1.0",
+    "groq-sdk": "^1.6.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "uiohook-napi": "^1.5.4"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "@vitejs/plugin-react": "^4.3.0",
+    "concurrently": "^9.0.0",
+    "cross-env": "^7.0.3",
+    "electron": "^34.0.0",
+    "electron-builder": "^25.1.0",
+    "nodemon": "^3.1.10",
+    "typescript": "^5.7.0",
+    "vite": "^6.0.0",
+    "wait-on": "^8.0.0"
+  }
+}
